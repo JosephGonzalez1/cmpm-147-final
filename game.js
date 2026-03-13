@@ -25,6 +25,24 @@ maze.push(row)
 
 }
 
+let roomCount=5
+
+for(let r=0;r<roomCount;r++){
+
+let rw=Math.floor(Math.random()*3)+3
+let rh=Math.floor(Math.random()*3)+3
+
+let rx=Math.floor(Math.random()*(width-rw-1))+1
+let ry=Math.floor(Math.random()*(height-rh-1))+1
+
+for(let y=ry;y<ry+rh;y++){
+for(let x=rx;x<rx+rw;x++){
+maze[y][x]="."
+}
+}
+
+}
+
 let x=0
 let y=0
 
@@ -79,17 +97,13 @@ let nx=player.x+dx
 let ny=player.y+dy
 
 if(nx>=0&&nx<width&&ny>=0&&ny<height&&maze[ny][nx]!=="#"){
-
 player.x=nx
 player.y=ny
-
 }
 
 if(maze[player.y][player.x]==="X"){
-
 alert("You escaped the labyrinth")
 startGame()
-
 }
 
 draw()
@@ -106,10 +120,8 @@ if(e.key==="d"||e.key==="ArrowRight")move(1,0)
 })
 
 function startGame(){
-
 generateMaze()
 draw()
-
 }
 
 startGame()
