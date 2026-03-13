@@ -25,6 +25,21 @@ maze.push(row)
 
 }
 
+let x=0
+let y=0
+
+while(x<width-1||y<height-1){
+
+maze[y][x]="."
+
+if(Math.random()<0.5&&x<width-1){
+x++
+}else if(y<height-1){
+y++
+}
+
+}
+
 maze[0][0]="S"
 maze[height-1][width-1]="X"
 
