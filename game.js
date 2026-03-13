@@ -1,8 +1,7 @@
-let width=10
-let height=10
+let width=15
+let height=15
 let maze=[]
 let player={x:0,y:0}
-let hasKey=false
 
 function generateMaze(){
 
@@ -14,7 +13,7 @@ let row=[]
 
 for(let x=0;x<width;x++){
 
-if(Math.random()<0.25){
+if(Math.random()<0.28){
 row.push("#")
 }else{
 row.push(".")
@@ -27,45 +26,10 @@ maze.push(row)
 }
 
 maze[0][0]="S"
-maze[height-1][width-1]="B"
-
-placeKey()
-placeLoot()
+maze[height-1][width-1]="X"
 
 player.x=0
 player.y=0
-hasKey=false
-
-}
-
-function placeKey(){
-
-for(let i=0;i<100;i++){
-
-let x=Math.floor(Math.random()*width)
-let y=Math.floor(Math.random()*height)
-
-if(maze[y][x]==="."){
-maze[y][x]="K"
-break
-}
-
-}
-
-}
-
-function placeLoot(){
-
-for(let i=0;i<4;i++){
-
-let x=Math.floor(Math.random()*width)
-let y=Math.floor(Math.random()*height)
-
-if(maze[y][x]==="."){
-maze[y][x]="T"
-}
-
-}
 
 }
 
@@ -106,25 +70,10 @@ player.y=ny
 
 }
 
-let tile=maze[player.y][player.x]
+if(maze[player.y][player.x]==="X"){
 
-if(tile==="K"){
-hasKey=true
-maze[player.y][player.x]="."
-}
-
-if(tile==="T"){
-maze[player.y][player.x]="."
-}
-
-if(tile==="B"){
-
-if(hasKey){
 alert("You escaped the labyrinth")
 startGame()
-}else{
-alert("Find the key first")
-}
 
 }
 
