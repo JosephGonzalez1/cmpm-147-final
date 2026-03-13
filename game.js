@@ -1,5 +1,5 @@
-let width=15
-let height=15
+let width=11
+let height=11
 let maze=[]
 let player={x:0,y:0}
 let hasKey=false
@@ -75,7 +75,7 @@ hasKey=false
 
 function placeKey(){
 
-while(true){
+for(let i=0;i<200;i++){
 
 let x=Math.floor(Math.random()*width)
 let y=Math.floor(Math.random()*height)
@@ -93,11 +93,16 @@ function placeLoot(){
 
 for(let i=0;i<5;i++){
 
+for(let j=0;j<200;j++){
+
 let x=Math.floor(Math.random()*width)
 let y=Math.floor(Math.random()*height)
 
 if(maze[y][x]==="."){
 maze[y][x]="T"
+break
+}
+
 }
 
 }
