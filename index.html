@@ -2,15 +2,28 @@
 <html>
 <head>
 <title>Procedural Death Labyrinth</title>
-<link rel="stylesheet" href="style.css">
+<style>
+body{
+    margin:0;
+    background:#0f0f0f;
+    color:white;
+    text-align:center;
+    font-family:monospace;
+}
+canvas{
+    background:#000;
+    margin-top:10px;
+    border:2px solid #333;
+}
+</style>
 </head>
 <body>
 
 <h2>Procedural Death Labyrinth</h2>
-
+<p>WASD / Arrow Keys to move</p>
 <button onclick="startGame()">Generate Labyrinth</button>
-
-<div id="grid"></div>
+<br>
+<canvas id="game" width="450" height="450"></canvas>
 
 <script src="game.js"></script>
 
