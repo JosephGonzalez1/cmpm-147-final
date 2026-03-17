@@ -6,7 +6,7 @@ let revealed = []
 
 let tileSize = 20
 let viewTiles = 15
-let visionRadius = 5
+let visionRadius = 3
 
 const canvas = document.getElementById("game")
 const ctx = canvas.getContext("2d")
@@ -53,32 +53,43 @@ function generateMaze(){
     maze[height-1][width-1]="X"
     player.x=0
     player.y=0
-    revealed[player.y][player.x]=true
+    revealAOE(player.x, player.y)
+}
+
+function revealAOE(px,py){
+    for(let dy=-visionRadius; dy<=visionRadius; dy++){
+        for(let dx=-visionRadius; dx<=visionRadius; dx++){
+            let nx = px+dx
+            let ny = py+dy
+            if(nx>=0 && nx<width && ny>=0 && ny<height){
+                revealed[ny][nx]=true
+            }
+        }
+    }
 }
 
 function draw(){
     ctx.clearRect(0,0,canvas.width,canvas.height)
-
     let half = Math.floor(viewTiles/2)
 
     for(let dy=-half; dy<=half; dy++){
         for(let dx=-half; dx<=half; dx++){
-
             let mx = player.x + dx
             let my = player.y + dy
-
             let screenX = (dx + half) * tileSize
             let screenY = (dy + half) * tileSize
 
-            let dist = Math.sqrt(dx*dx + dy*dy)
-
-            if(mx<0||mx>=width||my<0||my>=height||dist>visionRadius){
+            if(mx<0 || mx>=width || my<0 || my>=height){
                 ctx.fillStyle="#000"
                 ctx.fillRect(screenX, screenY, tileSize, tileSize)
                 continue
             }
 
-            revealed[my][mx]=true
+            if(!revealed[my][mx]){
+                ctx.fillStyle="#000"
+                ctx.fillRect(screenX, screenY, tileSize, tileSize)
+                continue
+            }
 
             if(player.x===mx && player.y===my){
                 ctx.fillStyle="green"
@@ -103,7 +114,7 @@ function move(dx,dy){
     if(nx>=0 && nx<width && ny>=0 && ny<height && maze[ny][nx]!=="#"){
         player.x=nx
         player.y=ny
-        revealed[ny][nx]=true
+        revealAOE(player.x, player.y)
     }
     if(maze[player.y][player.x]==="X"){
         setTimeout(()=>{alert("You escaped the labyrinth!"); startGame()},100)
