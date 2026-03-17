@@ -4,8 +4,9 @@ let maze = []
 let player = { x:0, y:0 }
 let revealed = []
 
-let tileSize = 15
-let viewTiles = 31
+let tileSize = 20
+let viewTiles = 15
+let visionRadius = 5
 
 const canvas = document.getElementById("game")
 const ctx = canvas.getContext("2d")
@@ -18,11 +19,8 @@ function generateMaze(){
         let row=[]
         let revRow=[]
         for(let x=0;x<width;x++){
-            if(Math.random()<0.28){
-                row.push("#")
-            }else{
-                row.push(".")
-            }
+            if(Math.random()<0.28) row.push("#")
+            else row.push(".")
             revRow.push(false)
         }
         maze.push(row)
@@ -47,11 +45,8 @@ function generateMaze(){
     let y=0
     while(x<width-1 || y<height-1){
         maze[y][x]="."
-        if(Math.random()<0.5 && x<width-1){
-            x++
-        }else if(y<height-1){
-            y++
-        }
+        if(Math.random()<0.5 && x<width-1) x++
+        else if(y<height-1) y++
     }
 
     maze[0][0]="S"
@@ -63,25 +58,41 @@ function generateMaze(){
 
 function draw(){
     ctx.clearRect(0,0,canvas.width,canvas.height)
-    for(let y=0;y<height;y++){
-        for(let x=0;x<width;x++){
-            if(revealed[y][x]){
-                if(player.x===x && player.y===y){
-                    ctx.fillStyle="green"
-                }else if(maze[y][x]==="#"){
-                    ctx.fillStyle="#222"
-                }else if(maze[y][x]==="S"){
-                    ctx.fillStyle="blue"
-                }else if(maze[y][x]==="X"){
-                    ctx.fillStyle="red"
-                }else{
-                    ctx.fillStyle="#555"
-                }
-                ctx.fillRect(x*tileSize, y*tileSize, tileSize, tileSize)
-            }else{
+
+    let half = Math.floor(viewTiles/2)
+
+    for(let dy=-half; dy<=half; dy++){
+        for(let dx=-half; dx<=half; dx++){
+
+            let mx = player.x + dx
+            let my = player.y + dy
+
+            let screenX = (dx + half) * tileSize
+            let screenY = (dy + half) * tileSize
+
+            let dist = Math.sqrt(dx*dx + dy*dy)
+
+            if(mx<0||mx>=width||my<0||my>=height||dist>visionRadius){
                 ctx.fillStyle="#000"
-                ctx.fillRect(x*tileSize, y*tileSize, tileSize, tileSize)
+                ctx.fillRect(screenX, screenY, tileSize, tileSize)
+                continue
             }
+
+            revealed[my][mx]=true
+
+            if(player.x===mx && player.y===my){
+                ctx.fillStyle="green"
+            }else if(maze[my][mx]==="#"){
+                ctx.fillStyle="#444"
+            }else if(maze[my][mx]==="S"){
+                ctx.fillStyle="blue"
+            }else if(maze[my][mx]==="X"){
+                ctx.fillStyle="red"
+            }else{
+                ctx.fillStyle="#888"
+            }
+
+            ctx.fillRect(screenX, screenY, tileSize, tileSize)
         }
     }
 }
