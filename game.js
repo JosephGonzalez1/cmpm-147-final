@@ -8,6 +8,8 @@ let totalFloors = 5
 
 let enemies = []
 let enemyCount = 5
+let loot = []
+let lootCount = 3
 
 let tileSize = 20
 let viewTiles = 15
@@ -20,6 +22,7 @@ function generateMaze(){
     maze=[]
     revealed=[]
     enemies=[]
+    loot=[]
 
     for(let y=0;y<height;y++){
         let row=[]
@@ -71,10 +74,9 @@ function generateMaze(){
     let exitTile = emptyTiles.splice(Math.floor(Math.random()*emptyTiles.length),1)[0]
     maze[exitTile.y][exitTile.x] = "X"
 
-    // Guaranteed enemy spawn near player
+    // Place enemies near player
     for(let i=0;i<enemyCount;i++){
         if(emptyTiles.length===0) break
-        // Pick tiles within 5 tiles radius of player
         let nearby = emptyTiles.filter(t=>Math.abs(t.x-player.x)<=5 && Math.abs(t.y-player.y)<=5)
         let spawnTile
         if(nearby.length>0){
@@ -83,11 +85,15 @@ function generateMaze(){
             spawnTile = emptyTiles.splice(Math.floor(Math.random()*emptyTiles.length),1)[0]
         }
         enemies.push({x:spawnTile.x, y:spawnTile.y, hp:3})
-        // remove from emptyTiles so no duplicate
         emptyTiles = emptyTiles.filter(t=>!(t.x===spawnTile.x && t.y===spawnTile.y))
     }
 
-    console.log("Enemies spawned:", enemies)
+    // Place loot
+    for(let i=0;i<lootCount;i++){
+        if(emptyTiles.length===0) break
+        let lootTile = emptyTiles.splice(Math.floor(Math.random()*emptyTiles.length),1)[0]
+        loot.push({x:lootTile.x, y:lootTile.y, type:"potion", value:5})
+    }
 }
 
 function revealAOE(px,py){
@@ -119,12 +125,21 @@ function draw(){
                 continue
             }
 
+            if(!revealed[my][mx]){
+                ctx.fillStyle="#000"
+                ctx.fillRect(screenX, screenY, tileSize, tileSize)
+                continue
+            }
+
             let enemyHere = enemies.find(e=>e.x===mx && e.y===my)
+            let lootHere = loot.find(l=>l.x===mx && l.y===my)
 
             if(player.x===mx && player.y===my){
                 ctx.fillStyle="green"
             }else if(enemyHere){
                 ctx.fillStyle="orange"
+            }else if(lootHere){
+                ctx.fillStyle="yellow"
             }else if(maze[my][mx]==="#"){
                 ctx.fillStyle="#444"
             }else if(maze[my][mx]==="S"){
@@ -151,6 +166,13 @@ function move(dx,dy){
         player.x=nx
         player.y=ny
         revealAOE(player.x, player.y)
+
+        // Check loot pickup
+        let lootIndex = loot.findIndex(l=>l.x===player.x && l.y===player.y)
+        if(lootIndex>=0){
+            let item = loot.splice(lootIndex,1)[0]
+            if(item.type==="potion") player.hp += item.value
+        }
 
         // Player attacks enemy if moved into them
         let enemyIndex = enemies.findIndex(e=>e.x===player.x && e.y===player.y)
