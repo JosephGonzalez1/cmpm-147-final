@@ -6,6 +6,9 @@ let revealed = []
 let currentFloor = 1
 let totalFloors = 5
 
+let enemies = []
+let enemyCount = 5
+
 let tileSize = 20
 let viewTiles = 15
 let visionRadius = 3
@@ -16,6 +19,7 @@ const ctx = canvas.getContext("2d")
 function generateMaze(){
     maze=[]
     revealed=[]
+    enemies=[]
 
     for(let y=0;y<height;y++){
         let row=[]
@@ -57,15 +61,23 @@ function generateMaze(){
 
     revealAOE(player.x, player.y)
 
-    // Random exit spawn
     let emptyTiles=[]
     for(let y=0;y<height;y++){
         for(let x=0;x<width;x++){
             if(maze[y][x]===".") emptyTiles.push({x,y})
         }
     }
-    let exitTile = emptyTiles[Math.floor(Math.random()*emptyTiles.length)]
+
+    // Place exit
+    let exitTile = emptyTiles.splice(Math.floor(Math.random()*emptyTiles.length),1)[0]
     maze[exitTile.y][exitTile.x] = "X"
+
+    // Place enemies
+    for(let i=0;i<enemyCount;i++){
+        if(emptyTiles.length===0) break
+        let enemyTile = emptyTiles.splice(Math.floor(Math.random()*emptyTiles.length),1)[0]
+        enemies.push({x:enemyTile.x, y:enemyTile.y, hp:3})
+    }
 }
 
 function revealAOE(px,py){
@@ -103,8 +115,12 @@ function draw(){
                 continue
             }
 
+            let enemyHere = enemies.find(e=>e.x===mx && e.y===my)
+
             if(player.x===mx && player.y===my){
                 ctx.fillStyle="green"
+            }else if(enemyHere){
+                ctx.fillStyle="orange"
             }else if(maze[my][mx]==="#"){
                 ctx.fillStyle="#444"
             }else if(maze[my][mx]==="S"){
@@ -118,7 +134,7 @@ function draw(){
             ctx.fillRect(screenX, screenY, tileSize, tileSize)
         }
     }
-    
+
     ctx.fillStyle="white"
     ctx.font="16px monospace"
     ctx.fillText(`Floor: ${currentFloor}/${totalFloors}  HP: ${player.hp}`,10,20)
@@ -131,7 +147,18 @@ function move(dx,dy){
         player.x=nx
         player.y=ny
         revealAOE(player.x, player.y)
+
+        // Check if player moved into enemy
+        let enemyIndex = enemies.findIndex(e=>e.x===player.x && e.y===player.y)
+        if(enemyIndex>=0){
+            player.hp -=1
+            enemies[enemyIndex].hp -=1
+            if(enemies[enemyIndex].hp<=0) enemies.splice(enemyIndex,1)
+        }
+
+        moveEnemies()
     }
+
     if(maze[player.y][player.x]==="X"){
         if(currentFloor<totalFloors){
             currentFloor++
@@ -141,6 +168,22 @@ function move(dx,dy){
         }
     }
     draw()
+}
+
+function moveEnemies(){
+    for(let e of enemies){
+        let dx = [0,1,0,-1][Math.floor(Math.random()*4)]
+        let dy = [1,0,-1,0][Math.floor(Math.random()*4)]
+        let nx = e.x + dx
+        let ny = e.y + dy
+        if(nx>=0 && nx<width && ny>=0 && ny<height && maze[ny][nx]==="." && !(nx===player.x && ny===player.y)){
+            e.x=nx
+            e.y=ny
+        }
+        if(e.x===player.x && e.y===player.y){
+            player.hp -=1
+        }
+    }
 }
 
 document.addEventListener("keydown", e=>{
