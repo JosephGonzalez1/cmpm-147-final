@@ -1,8 +1,10 @@
 let width = 31
 let height = 31
 let maze = []
-let player = { x:0, y:0 }
+let player = { x:0, y:0, hp:10 }
 let revealed = []
+let currentFloor = 1
+let totalFloors = 5
 
 let tileSize = 20
 let viewTiles = 15
@@ -116,6 +118,10 @@ function draw(){
             ctx.fillRect(screenX, screenY, tileSize, tileSize)
         }
     }
+    
+    ctx.fillStyle="white"
+    ctx.font="16px monospace"
+    ctx.fillText(`Floor: ${currentFloor}/${totalFloors}  HP: ${player.hp}`,10,20)
 }
 
 function move(dx,dy){
@@ -127,7 +133,12 @@ function move(dx,dy){
         revealAOE(player.x, player.y)
     }
     if(maze[player.y][player.x]==="X"){
-        setTimeout(()=>{alert("You escaped the labyrinth!"); startGame()},100)
+        if(currentFloor<totalFloors){
+            currentFloor++
+            generateMaze()
+        } else {
+            setTimeout(()=>{alert("You escaped all floors!"); startGame()},100)
+        }
     }
     draw()
 }
@@ -140,6 +151,8 @@ document.addEventListener("keydown", e=>{
 })
 
 function startGame(){
+    currentFloor=1
+    player.hp=10
     generateMaze()
     draw()
 }
