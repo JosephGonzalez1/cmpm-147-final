@@ -50,10 +50,20 @@ function generateMaze(){
     }
 
     maze[0][0]="S"
-    maze[height-1][width-1]="X"
     player.x=0
     player.y=0
+
     revealAOE(player.x, player.y)
+
+    // Random exit spawn
+    let emptyTiles=[]
+    for(let y=0;y<height;y++){
+        for(let x=0;x<width;x++){
+            if(maze[y][x]===".") emptyTiles.push({x,y})
+        }
+    }
+    let exitTile = emptyTiles[Math.floor(Math.random()*emptyTiles.length)]
+    maze[exitTile.y][exitTile.x] = "X"
 }
 
 function revealAOE(px,py){
