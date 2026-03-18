@@ -42,7 +42,6 @@ function generateMaze(){
         let rh=Math.floor(Math.random()*3)+3
         let rx=Math.floor(Math.random()*(width-rw-1))+1
         let ry=Math.floor(Math.random()*(height-rh-1))+1
-
         for(let y=ry;y<ry+rh;y++){
             for(let x=rx;x<rx+rw;x++){
                 maze[y][x]="."
@@ -61,43 +60,33 @@ function generateMaze(){
     maze[0][0]="S"
     player.x=0
     player.y=0
-    revealAOE(player.x, player.y)
+
+    let endX = width-1
+    let endY = height-1
+    maze[endY][endX]="X"
 
     let emptyTiles=[]
     for(let y=0;y<height;y++){
         for(let x=0;x<width;x++){
-            if(maze[y][x]===".") emptyTiles.push({x,y})
+            if(maze[y][x]==="." && !(x===0 && y===0) && !(x===endX && y===endY)) emptyTiles.push({x,y})
         }
     }
 
-    // Place exit
-    let exitTile = emptyTiles.splice(Math.floor(Math.random()*emptyTiles.length),1)[0]
-    maze[exitTile.y][exitTile.x] = "X"
-
-    // Room-based enemy spawn
-    let roomTiles = []
-    for(let y=1;y<height-1;y++){
-        for(let x=1;x<width-1;x++){
-            if(maze[y][x]==="." && !(x===0 && y===0) &&
-               maze[y-1][x]==="." && maze[y+1][x]==="." &&
-               maze[y][x-1]==="." && maze[y][x+1]==="."){
-                roomTiles.push({x,y})
-            }
-        }
-    }
     for(let i=0;i<enemyCount;i++){
-        if(roomTiles.length===0) break
-        let idx = Math.floor(Math.random()*roomTiles.length)
-        let spawnTile = roomTiles.splice(idx,1)[0]
+        if(emptyTiles.length===0) break
+        let idx = Math.floor(Math.random()*emptyTiles.length)
+        let spawnTile = emptyTiles.splice(idx,1)[0]
         enemies.push({x:spawnTile.x, y:spawnTile.y, hp:3})
     }
 
-    // Place loot
     for(let i=0;i<lootCount;i++){
         if(emptyTiles.length===0) break
-        let lootTile = emptyTiles.splice(Math.floor(Math.random()*emptyTiles.length),1)[0]
+        let idx = Math.floor(Math.random()*emptyTiles.length)
+        let lootTile = emptyTiles.splice(idx,1)[0]
         loot.push({x:lootTile.x, y:lootTile.y, type:"potion", value:5})
     }
+
+    revealAOE(player.x, player.y)
 }
 
 function revealAOE(px,py){
@@ -171,14 +160,12 @@ function move(dx,dy){
         player.y=ny
         revealAOE(player.x, player.y)
 
-        // Pick up loot
         let lootIndex = loot.findIndex(l=>l.x===player.x && l.y===player.y)
         if(lootIndex>=0){
             let item = loot.splice(lootIndex,1)[0]
             if(item.type==="potion") player.hp += item.value
         }
 
-        // Player attacks enemy by moving into them
         let enemyIndex = enemies.findIndex(e=>e.x===player.x && e.y===player.y)
         if(enemyIndex>=0){
             player.hp -=1
