@@ -166,13 +166,6 @@ function move(dx,dy){
             if(item.type==="potion") player.hp += item.value
         }
 
-        let enemyIndex = enemies.findIndex(e=>e.x===player.x && e.y===player.y)
-        if(enemyIndex>=0){
-            player.hp -=1
-            enemies[enemyIndex].hp -=1
-            if(enemies[enemyIndex].hp<=0) enemies.splice(enemyIndex,1)
-        }
-
         moveEnemies()
     }
 
@@ -183,6 +176,17 @@ function move(dx,dy){
         } else {
             setTimeout(()=>{alert("You escaped all floors!"); startGame()},100)
         }
+    }
+    draw()
+}
+
+function attack(dx, dy){
+    let targetX = player.x + dx
+    let targetY = player.y + dy
+    let enemyIndex = enemies.findIndex(e=>e.x===targetX && e.y===targetY)
+    if(enemyIndex >= 0){
+        enemies[enemyIndex].hp -= 1
+        if(enemies[enemyIndex].hp <= 0) enemies.splice(enemyIndex,1)
     }
     draw()
 }
@@ -204,10 +208,15 @@ function moveEnemies(){
 }
 
 document.addEventListener("keydown", e=>{
-    if(e.key==="w"||e.key==="ArrowUp") move(0,-1)
-    if(e.key==="s"||e.key==="ArrowDown") move(0,1)
-    if(e.key==="a"||e.key==="ArrowLeft") move(-1,0)
-    if(e.key==="d"||e.key==="ArrowRight") move(1,0)
+    if(e.key==="w") move(0,-1)
+    if(e.key==="s") move(0,1)
+    if(e.key==="a") move(-1,0)
+    if(e.key==="d") move(1,0)
+    
+    if(e.key==="ArrowUp") attack(0,-1)
+    if(e.key==="ArrowDown") attack(0,1)
+    if(e.key==="ArrowLeft") attack(-1,0)
+    if(e.key==="ArrowRight") attack(1,0)
 })
 
 function startGame(){
