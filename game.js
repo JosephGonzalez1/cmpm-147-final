@@ -58,7 +58,6 @@ function generateMaze(){
     maze[0][0]="S"
     player.x=0
     player.y=0
-
     revealAOE(player.x, player.y)
 
     let emptyTiles=[]
@@ -72,12 +71,23 @@ function generateMaze(){
     let exitTile = emptyTiles.splice(Math.floor(Math.random()*emptyTiles.length),1)[0]
     maze[exitTile.y][exitTile.x] = "X"
 
-    // Place enemies
+    // Guaranteed enemy spawn near player
     for(let i=0;i<enemyCount;i++){
         if(emptyTiles.length===0) break
-        let enemyTile = emptyTiles.splice(Math.floor(Math.random()*emptyTiles.length),1)[0]
-        enemies.push({x:enemyTile.x, y:enemyTile.y, hp:3})
+        // Pick tiles within 5 tiles radius of player
+        let nearby = emptyTiles.filter(t=>Math.abs(t.x-player.x)<=5 && Math.abs(t.y-player.y)<=5)
+        let spawnTile
+        if(nearby.length>0){
+            spawnTile = nearby.splice(Math.floor(Math.random()*nearby.length),1)[0]
+        } else {
+            spawnTile = emptyTiles.splice(Math.floor(Math.random()*emptyTiles.length),1)[0]
+        }
+        enemies.push({x:spawnTile.x, y:spawnTile.y, hp:3})
+        // remove from emptyTiles so no duplicate
+        emptyTiles = emptyTiles.filter(t=>!(t.x===spawnTile.x && t.y===spawnTile.y))
     }
+
+    console.log("Enemies spawned:", enemies)
 }
 
 function revealAOE(px,py){
@@ -104,12 +114,6 @@ function draw(){
             let screenY = (dy + half) * tileSize
 
             if(mx<0 || mx>=width || my<0 || my>=height){
-                ctx.fillStyle="#000"
-                ctx.fillRect(screenX, screenY, tileSize, tileSize)
-                continue
-            }
-
-            if(!revealed[my][mx]){
                 ctx.fillStyle="#000"
                 ctx.fillRect(screenX, screenY, tileSize, tileSize)
                 continue
@@ -148,7 +152,7 @@ function move(dx,dy){
         player.y=ny
         revealAOE(player.x, player.y)
 
-        // Check if player moved into enemy
+        // Player attacks enemy if moved into them
         let enemyIndex = enemies.findIndex(e=>e.x===player.x && e.y===player.y)
         if(enemyIndex>=0){
             player.hp -=1
@@ -199,7 +203,5 @@ function startGame(){
     generateMaze()
     draw()
 }
-
-console.log("Enemies spawned:", enemies)
 
 startGame()
