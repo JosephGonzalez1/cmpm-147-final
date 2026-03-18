@@ -169,6 +169,11 @@ function move(dx,dy){
         moveEnemies()
     }
 
+    if(player.hp <= 0){
+        setTimeout(()=>{ alert("You died!"); startGame() }, 50)
+        return
+    }
+
     if(maze[player.y][player.x]==="X"){
         if(currentFloor<totalFloors){
             currentFloor++
@@ -204,6 +209,10 @@ function moveEnemies(){
         if(e.x===player.x && e.y===player.y){
             player.hp -=1
         }
+    }
+
+    if(player.hp <= 0){
+        setTimeout(()=>{ alert("You died!"); startGame() }, 50)
     }
 }
 
