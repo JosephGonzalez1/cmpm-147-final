@@ -74,18 +74,22 @@ function generateMaze(){
     let exitTile = emptyTiles.splice(Math.floor(Math.random()*emptyTiles.length),1)[0]
     maze[exitTile.y][exitTile.x] = "X"
 
-    // Place enemies near player
-    for(let i=0;i<enemyCount;i++){
-        if(emptyTiles.length===0) break
-        let nearby = emptyTiles.filter(t=>Math.abs(t.x-player.x)<=5 && Math.abs(t.y-player.y)<=5)
-        let spawnTile
-        if(nearby.length>0){
-            spawnTile = nearby.splice(Math.floor(Math.random()*nearby.length),1)[0]
-        } else {
-            spawnTile = emptyTiles.splice(Math.floor(Math.random()*emptyTiles.length),1)[0]
+    // Room-based enemy spawn
+    let roomTiles = []
+    for(let y=1;y<height-1;y++){
+        for(let x=1;x<width-1;x++){
+            if(maze[y][x]==="." && !(x===0 && y===0) &&
+               maze[y-1][x]==="." && maze[y+1][x]==="." &&
+               maze[y][x-1]==="." && maze[y][x+1]==="."){
+                roomTiles.push({x,y})
+            }
         }
+    }
+    for(let i=0;i<enemyCount;i++){
+        if(roomTiles.length===0) break
+        let idx = Math.floor(Math.random()*roomTiles.length)
+        let spawnTile = roomTiles.splice(idx,1)[0]
         enemies.push({x:spawnTile.x, y:spawnTile.y, hp:3})
-        emptyTiles = emptyTiles.filter(t=>!(t.x===spawnTile.x && t.y===spawnTile.y))
     }
 
     // Place loot
@@ -167,14 +171,14 @@ function move(dx,dy){
         player.y=ny
         revealAOE(player.x, player.y)
 
-        // Check loot pickup
+        // Pick up loot
         let lootIndex = loot.findIndex(l=>l.x===player.x && l.y===player.y)
         if(lootIndex>=0){
             let item = loot.splice(lootIndex,1)[0]
             if(item.type==="potion") player.hp += item.value
         }
 
-        // Player attacks enemy if moved into them
+        // Player attacks enemy by moving into them
         let enemyIndex = enemies.findIndex(e=>e.x===player.x && e.y===player.y)
         if(enemyIndex>=0){
             player.hp -=1
