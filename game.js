@@ -213,10 +213,10 @@ document.addEventListener("keydown", e=>{
     if(e.key==="a") move(-1,0)
     if(e.key==="d") move(1,0)
     
-    if(e.key==="ArrowUp") attack(0,-1)
-    if(e.key==="ArrowDown") attack(0,1)
-    if(e.key==="ArrowLeft") attack(-1,0)
-    if(e.key==="ArrowRight") attack(1,0)
+    if(e.key==="ArrowUp"){ e.preventDefault(); attack(0,-1) }
+    if(e.key==="ArrowDown"){ e.preventDefault(); attack(0,1) }
+    if(e.key==="ArrowLeft"){ e.preventDefault(); attack(-1,0) }
+    if(e.key==="ArrowRight"){ e.preventDefault(); attack(1,0) }
 })
 
 function startGame(){
