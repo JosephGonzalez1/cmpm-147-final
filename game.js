@@ -200,4 +200,6 @@ function startGame(){
     draw()
 }
 
+console.log("Enemies spawned:", enemies)
+
 startGame()
