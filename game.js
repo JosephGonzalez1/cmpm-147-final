@@ -1,7 +1,7 @@
 let width = 31
 let height = 31
 let maze = []
-let player = { x:0, y:0, hp:10 }
+let player = { x:0, y:0, hp:5 }
 let revealed = []
 let currentFloor = 1
 let totalFloors = 5
