@@ -152,6 +152,17 @@ function draw(){
     ctx.fillText(`Floor: ${currentFloor}/${totalFloors}  HP: ${player.hp}`,10,20)
 }
 
+function checkDeath(){
+    if(player.hp <= 0){
+        setTimeout(()=>{
+            alert("You died!")
+            startGame()
+        }, 50)
+        return true
+    }
+    return false
+}
+
 function move(dx,dy){
     let nx = player.x + dx
     let ny = player.y + dy
@@ -169,10 +180,7 @@ function move(dx,dy){
         moveEnemies()
     }
 
-    if(player.hp <= 0){
-        setTimeout(()=>{ alert("You died!"); startGame() }, 50)
-        return
-    }
+    if(checkDeath()) return
 
     if(maze[player.y][player.x]==="X"){
         if(currentFloor<totalFloors){
@@ -193,6 +201,7 @@ function attack(dx, dy){
         enemies[enemyIndex].hp -= 1
         if(enemies[enemyIndex].hp <= 0) enemies.splice(enemyIndex,1)
     }
+    checkDeath()
     draw()
 }
 
@@ -211,9 +220,7 @@ function moveEnemies(){
         }
     }
 
-    if(player.hp <= 0){
-        setTimeout(()=>{ alert("You died!"); startGame() }, 50)
-    }
+    checkDeath()
 }
 
 document.addEventListener("keydown", e=>{
@@ -230,7 +237,7 @@ document.addEventListener("keydown", e=>{
 
 function startGame(){
     currentFloor=1
-    player.hp=10
+    player.hp=5
     generateMaze()
     draw()
 }
