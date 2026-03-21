@@ -1,7 +1,7 @@
 let width = 31
 let height = 31
 let maze = []
-let player = { x:0, y:0, hp:5 }
+let player = { x:0, y:0, hp:1 }
 let revealed = []
 let currentFloor = 1
 let totalFloors = 5
@@ -10,6 +10,8 @@ let enemies = []
 let enemyCount = 5
 let loot = []
 let lootCount = 3
+
+let isGameOver = false
 
 let tileSize = 20
 let viewTiles = 15
@@ -153,7 +155,8 @@ function draw(){
 }
 
 function checkDeath(){
-    if(player.hp <= 0){
+    if(player.hp <= 0 && !isGameOver){
+        isGameOver = true
         setTimeout(()=>{
             alert("You died!")
             startGame()
@@ -236,8 +239,9 @@ document.addEventListener("keydown", e=>{
 })
 
 function startGame(){
+    isGameOver = false
     currentFloor=1
-    player.hp=5
+    player.hp=1
     generateMaze()
     draw()
 }
