@@ -1,7 +1,7 @@
 let width = 31
 let height = 31
 let maze = []
-let player = { x:0, y:0, hp:1 }
+let player = { x:0, y:0, hp:5 }
 let revealed = []
 let currentFloor = 1
 let totalFloors = 5
@@ -241,7 +241,7 @@ document.addEventListener("keydown", e=>{
 function startGame(){
     isGameOver = false
     currentFloor=1
-    player.hp=1
+    player.hp=5
     generateMaze()
     draw()
 }
